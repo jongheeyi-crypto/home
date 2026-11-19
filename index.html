@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#FFE7A8" />
+<meta name="description" content="출동! 인성 대원의 등원 대작전 — 아이패드 가로형 우리집 등원 대시보드. 오늘 날씨·옷차림 팁, 등원 준비 루틴 체크, 준비물, 가족 일정을 한눈에." />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="등원 대작전" />
+<title>출동! 인성 대원의 등원 대작전 🐾</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@500;700;900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css?v=1" />
+</head>
+<body>
+
+<!-- 공용 SVG 심볼: 발자국 · 별 -->
+<svg class="sprite" aria-hidden="true" focusable="false" width="0" height="0">
+  <symbol id="pawShape" viewBox="0 0 100 100">
+    <ellipse cx="21" cy="39" rx="10.5" ry="13.6" transform="rotate(-20 21 39)" />
+    <ellipse cx="40" cy="25" rx="11" ry="14.6" transform="rotate(-7 40 25)" />
+    <ellipse cx="61" cy="25" rx="11" ry="14.6" transform="rotate(7 61 25)" />
+    <ellipse cx="80" cy="39" rx="10.5" ry="13.6" transform="rotate(20 80 39)" />
+    <path d="M50.5 47c13.4 0 25.5 9.2 25.5 21.4C76 80.6 66.6 87 50.5 87S25 80.6 25 68.4C25 56.2 37.1 47 50.5 47z" />
+  </symbol>
+  <symbol id="starShape" viewBox="0 0 100 100">
+    <path d="M50 4l13.2 28.4 31 3.8-22.9 21.2 6.1 30.6L50 73.2 22.6 88l6.1-30.6L5.8 36.2l31-3.8z" />
+  </symbol>
+</svg>
+
+<div class="sky" aria-hidden="true">
+  <span class="cloud cloud-a"></span>
+  <span class="cloud cloud-b"></span>
+  <span class="cloud cloud-c"></span>
+  <span class="sun"></span>
+</div>
+
+<div class="app">
+
+  <!-- 상단 슬림 바 -->
+  <div class="topbar">
+    <p class="topbar-brand"><span aria-hidden="true">🐾</span> 우리집 등원 대시보드</p>
+    <div class="topbar-actions">
+      <button type="button" class="sync-badge" id="syncStatus" data-state="off" title="실시간 동기화 상태 · 설정 열기">⚪ 이 기기만 저장 중</button>
+      <button type="button" class="mini-btn" id="copyLink">🔗 가족 링크 복사</button>
+      <button type="button" class="mini-btn" id="openSettings">⚙️ 엄마 설정</button>
+    </div>
+  </div>
+
+  <!-- 히어로 -->
+  <header class="hero">
+    <div class="hero-left">
+      <div class="hero-dogs" id="heroDogs" aria-hidden="true"></div>
+      <div class="hero-title-wrap">
+        <p class="hero-kicker">Paw Patrol · 목동 우리집</p>
+        <h1>출동! 인성 대원의 등원 대작전 <span class="paw" aria-hidden="true">🐾</span></h1>
+        <p class="hero-clock">
+          <span class="clock" id="clock">--:--:--</span>
+          <span class="today" id="todayLabel">오늘</span>
+        </p>
+      </div>
+    </div>
+
+    <section class="hero-weather" aria-labelledby="weatherTitle">
+      <h2 class="sr-only" id="weatherTitle">오늘 목동 날씨와 옷차림</h2>
+      <div class="weather-main">
+        <span class="w-icon" id="wIcon" aria-hidden="true">🌤️</span>
+        <div class="w-temp-wrap">
+          <p class="w-temp"><strong id="wTemp">--</strong><span>°</span></p>
+          <p class="w-desc" id="wDesc">목동 날씨 불러오는 중…</p>
+        </div>
+      </div>
+      <ul class="weather-chips" id="wChips">
+        <li class="w-chip">체감 <b>--°</b></li>
+        <li class="w-chip">최저·최고 <b>--° / --°</b></li>
+        <li class="w-chip">강수 <b>--%</b></li>
+        <li class="w-chip">미세먼지 <b>--</b></li>
+      </ul>
+      <p class="weather-tip" id="wTip">🌤️ 오늘도 신나게 출동해요!</p>
+    </section>
+
+    <section class="hero-count" aria-labelledby="countTitle">
+      <h2 class="sr-only" id="countTitle">등원 출발 카운트다운</h2>
+      <p class="cd-kicker" id="cdKicker">등원 출발까지</p>
+      <p class="cd-time" id="cdTime">--:--</p>
+      <div class="cd-bar" aria-hidden="true"><span id="cdFill"></span></div>
+      <p class="cd-badge" id="cdBadge" data-state="calm">여유 있어요</p>
+      <p class="cd-sub" id="cdSub">08:50 출발 예정</p>
+    </section>
+  </header>
+
+  <!-- 3열 보드 -->
+  <main class="board">
+
+    <!-- 왼쪽: 오늘의 루틴 -->
+    <section class="col col-routine" aria-labelledby="routineTitle">
+      <div class="card routine-card">
+        <div class="card-head">
+          <h2 id="routineTitle">☀️ 오늘의 등원 루틴</h2>
+          <span class="pill blue" id="routineCount">0 / 5</span>
+        </div>
+        <div class="progress" aria-hidden="true"><span id="routineFill"></span></div>
+        <ul class="routine-list" id="routineList"></ul>
+        <p class="routine-foot" id="routineFoot">대원, 위에서부터 차례대로 톡톡 눌러 봐요!</p>
+      </div>
+    </section>
+
+    <!-- 가운데: 준비물 + 메모 -->
+    <section class="col col-prep" aria-labelledby="prepTitle">
+      <div class="card prep-card">
+        <div class="card-head">
+          <h2 id="prepTitle">🎒 등원 준비물</h2>
+          <span class="pill green" id="prepCount">0 / 0</span>
+        </div>
+        <div class="day-tabs" id="prepTabs" role="tablist" aria-label="준비물 요일 선택"></div>
+        <p class="day-caption" id="prepCaption">오늘 준비물</p>
+        <ul class="check-list" id="prepList"></ul>
+        <div class="prep-deco" id="prepDeco" aria-hidden="true"></div>
+        <p class="prep-foot"><span aria-hidden="true">🎒</span> 가방 앞에서 하나씩 짚어 보며 확인!</p>
+      </div>
+
+      <div class="card note-card">
+        <div class="card-head">
+          <h2>📌 엄마의 알림</h2>
+          <button type="button" class="icon-btn" id="noteEdit" aria-label="알림 메모 수정">✏️</button>
+        </div>
+        <p class="note-text" id="noteText">엄마가 남긴 알림이 아직 없어요</p>
+        <p class="note-time" id="noteTime"></p>
+      </div>
+    </section>
+
+    <!-- 오른쪽: 일정 + 바로가기 -->
+    <section class="col col-plan" aria-labelledby="planTitle">
+      <div class="card plan-card">
+        <div class="card-head">
+          <h2 id="planTitle">📅 우리집 일정</h2>
+          <span class="plan-dog" id="planDog" aria-hidden="true"></span>
+        </div>
+        <div class="day-tabs" id="planTabs" role="tablist" aria-label="일정 요일 선택"></div>
+        <p class="day-caption" id="planCaption">오늘 일정</p>
+        <ul class="plan-list" id="planList"></ul>
+        <div class="plan-deco" id="planDeco" aria-hidden="true"></div>
+        <div class="links">
+          <a class="link-btn" href="https://jongheeyi-crypto.github.io/insungstudy/" target="_blank" rel="noopener">
+            <span aria-hidden="true">🐾</span> 미션판
+          </a>
+          <a class="link-btn" href="https://jongheeyi-crypto.github.io/fridge/" target="_blank" rel="noopener">
+            <span aria-hidden="true">🧊</span> 냉장고
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>만든 사람: 엄마 💛 · 인성 대원 화이팅! <span class="dot">·</span> 무료 GitHub Pages</p>
+  </footer>
+</div>
+
+<!-- 축하 모달 -->
+<div class="modal celebrate" id="celebrateModal" hidden>
+  <div class="modal-box celebrate-box" role="dialog" aria-modal="true" aria-labelledby="celebrateTitle">
+    <div class="celebrate-dogs" id="celebrateDogs" aria-hidden="true"></div>
+    <h2 id="celebrateTitle">출동 준비 완료!</h2>
+    <p class="celebrate-msg">인성 대원 최고예요! 🐾🎉</p>
+    <p class="celebrate-sub" id="celebrateSub">5단계를 모두 해냈어요. 이제 신나게 출발!</p>
+    <button type="button" class="primary-btn" id="celebrateClose">출동! 🚨</button>
+  </div>
+</div>
+
+<!-- 설정 모달 -->
+<div class="modal" id="settingsModal" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="modal-head">
+      <h2 id="settingsTitle">⚙️ 엄마 설정</h2>
+      <button type="button" class="icon-btn" id="settingsClose" aria-label="설정 닫기">✕</button>
+    </div>
+    <div class="set-tabs" role="tablist" aria-label="설정 항목">
+      <button type="button" class="set-tab on" data-tab="basic" role="tab">기본</button>
+      <button type="button" class="set-tab" data-tab="routine" role="tab">루틴</button>
+      <button type="button" class="set-tab" data-tab="prep" role="tab">준비물</button>
+      <button type="button" class="set-tab" data-tab="plan" role="tab">일정</button>
+      <button type="button" class="set-tab" data-tab="sync" role="tab">실시간 연결</button>
+    </div>
+    <div class="set-body" id="settingsBody"></div>
+    <div class="modal-foot">
+      <p class="set-hint">바꾸는 즉시 저장되고, 연결돼 있으면 다른 기기에도 바로 반영돼요.</p>
+      <button type="button" class="primary-btn" id="settingsDone">완료</button>
+    </div>
+  </div>
+</div>
+
+<!-- 메모 편집 모달 -->
+<div class="modal" id="noteModal" hidden>
+  <div class="modal-box note-box" role="dialog" aria-modal="true" aria-labelledby="noteTitle">
+    <div class="modal-head">
+      <h2 id="noteTitle">📌 엄마의 알림 메모</h2>
+      <button type="button" class="icon-btn" id="noteClose" aria-label="메모 닫기">✕</button>
+    </div>
+    <div class="note-body">
+      <label class="field-label" for="noteInput">아이패드 화면에 크게 보여요 (한 줄이면 충분해요)</label>
+      <textarea id="noteInput" rows="3" maxlength="160" placeholder="예) 오늘 야외활동 있어요 · 편한 신발!"></textarea>
+      <div class="quick-notes">
+        <button type="button" data-quick="오늘 야외활동 있어요 · 편한 신발!">야외활동</button>
+        <button type="button" data-quick="물통 꼭 챙기고 우산도 가방에!">우산·물통</button>
+        <button type="button" data-quick="오늘은 하원 후 할머니집 💛">할머니집</button>
+        <button type="button" data-quick="오늘 준비물 많아요 · 가방 미리 확인!">준비물 확인</button>
+      </div>
+      <div class="note-actions">
+        <button type="button" class="ghost-btn" id="noteClear">지우기</button>
+        <button type="button" class="primary-btn" id="noteSave">저장</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="confetti" id="confetti" aria-hidden="true"></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<noscript><p class="noscript">이 화면은 자바스크립트가 필요해요.</p></noscript>
+
+<script src="app.js?v=1"></script>
+</body>
+</html>
