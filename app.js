@@ -11,7 +11,6 @@
   var ROOM_KEY = 'insung_home_room_v1';
   var STORE_KEY = 'insung_home_state_v1';
   var CLIENT_KEY = 'insung_home_client_v1';
-  var CELEB_KEY = 'insung_home_celebrated_v1';
   var MIN_ROOM_LEN = 12;
   var MAX_ROOM_LEN = 64;
   var DAY_NAMES = ['일', '월', '화', '수', '목', '금', '토'];
@@ -395,12 +394,6 @@
   }
 
   /* ---------- 렌더: 히어로 ---------- */
-  var lastCompleteKey = '';
-  var celebrated = {};
-  try { celebrated = JSON.parse(window.localStorage.getItem(CELEB_KEY) || '{}') || {}; } catch (e) { celebrated = {}; }
-  function saveCelebrated() {
-    try { window.localStorage.setItem(CELEB_KEY, JSON.stringify(celebrated)); } catch (e) { /* 무시 */ }
-  }
 
   function renderHeroDogs() {
     var box = byId('heroDogs');
@@ -1095,9 +1088,6 @@
     });
   }
 
-  /* 오후에 한 번 더 갱신 (등원 시간대 강수) */
-  function renderWeatherAfternoon() { /* 확장 여지 */ }
-
   /* ---------- 렌더 전체 ---------- */
   function renderAll() {
     renderClock();
@@ -1112,15 +1102,17 @@
   }
 
   /* ---------- 축하 ---------- */
+  var wasComplete = false;
+  var firstRender = true;
   function maybeCelebrate(done, total) {
-    if (total <= 0 || done < total) return;
-    var key = todayKey();
-    if (lastCompleteKey === key) return;
-    lastCompleteKey = key;
-    if (celebrated[key]) return;
-    celebrated[key] = Date.now();
-    saveCelebrated();
-    openCelebrate(total);
+    var complete = total > 0 && done >= total;
+    if (firstRender) {          /* 이미 다 되어 있는 상태로 열었을 땐 팝업 없이 */
+      firstRender = false;
+      wasComplete = complete;
+      return;
+    }
+    if (complete && !wasComplete) openCelebrate(total);
+    wasComplete = complete;
   }
 
   function openCelebrate(total) {
@@ -1173,12 +1165,10 @@
     if (entry.checked[id]) delete entry.checked[id];
     else entry.checked[id] = true;
     entry.at = Date.now();
-    lastCompleteKey = '';
     saveLocal();
     pushSoon();
     renderRoutine();
     renderCountdown();
-    if (countRoutineDone() < getSettings().routine.length) lastCompleteKey = '';
   }
 
   function togglePrep(dateKey, id) {
@@ -1278,7 +1268,6 @@
           var key = todayKey();
           state.routine[key] = { checked: {}, at: Date.now() };
           state.prep[key] = { checked: {}, at: Date.now() };
-          lastCompleteKey = '';
           saveLocal(); pushSoon(); renderAll();
           toast('오늘 체크를 모두 지웠어요');
         });
@@ -1726,7 +1715,6 @@
     currentDay = key;
     prepDay = null;
     planDay = null;
-    lastCompleteKey = '';
     pruneOldDays();
     saveLocal();
     renderAll();
